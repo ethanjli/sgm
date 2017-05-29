@@ -58,7 +58,7 @@ void init_disparity_method(const uint8_t _p1, const uint8_t _p2) {
     cols = 0;
 }
 
-cv::Mat compute_disparity_method(cv::Mat left, cv::Mat right, float *elapsed_time_ms, const char* directory, const char* fname) {
+cv::Mat compute_disparity_method(cv::Mat left, cv::Mat right, const char* directory, const char* fname) {
 	if(cols != left.cols || rows != left.rows) {
 		debug_log("WARNING: cols or rows are different");
 		if(!first_alloc) {
@@ -101,11 +101,6 @@ cv::Mat compute_disparity_method(cv::Mat left, cv::Mat right, float *elapsed_tim
 	CUDA_CHECK_RETURN(cudaMemcpyAsync(d_im0, left.ptr<uint8_t>(), sizeof(uint8_t)*size, cudaMemcpyHostToDevice, stream1));
 	CUDA_CHECK_RETURN(cudaMemcpyAsync(d_im1, right.ptr<uint8_t>(), sizeof(uint8_t)*size, cudaMemcpyHostToDevice, stream1));
 
-	cudaEvent_t start, stop;
-	cudaEventCreate(&start);
-	cudaEventCreate(&stop);
-	cudaEventRecord(start, 0);
-
 	dim3 block_size;
 	block_size.x = 32;
 	block_size.y = 32;
@@ -146,11 +141,7 @@ cv::Mat compute_disparity_method(cv::Mat left, cv::Mat right, float *elapsed_tim
 	debug_log("Calling Median Filter");
 	MedianFilter3x3<<<(size+MAX_DISPARITY-1)/MAX_DISPARITY, MAX_DISPARITY, 0, stream1>>>(d_disparity, d_disparity_filtered_uchar, rows, cols);
 
-	cudaEventRecord(stop, 0);
 	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
-	cudaEventElapsedTime(elapsed_time_ms, start, stop);
-	cudaEventDestroy(start);
-	cudaEventDestroy(stop);
 
 	debug_log("Copying final disparity to CPU");
 	CUDA_CHECK_RETURN(cudaMemcpy(h_disparity, d_disparity_filtered_uchar, sizeof(uint8_t)*size, cudaMemcpyDeviceToHost));

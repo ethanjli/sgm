@@ -145,9 +145,8 @@ int main(int argc, char *argv[]) {
 	const bool has_gt = directory_exists(gt_dir_sub);
 	int n = 0;
 	int n_err = 0;
-	std::vector<float> times;
 
-	init_disparity_method(p1, p2);
+	init_disparity_method(p1, p2); // TODO: port this!
 	while ((ep = readdir(dp)) != NULL) {
 		// Skip directories
 		if (!strcmp (ep->d_name, "."))
@@ -194,12 +193,10 @@ int main(int argc, char *argv[]) {
 		std::cout << "processing: " << left_file << std::endl;
 #endif
 		// Compute
-		float elapsed_time_ms;
-		cv::Mat disparity_im = compute_disparity_method(h_im0, h_im1, &elapsed_time_ms, directory, ep->d_name);
+		cv::Mat disparity_im = compute_disparity_method(h_im0, h_im1, directory, ep->d_name); // TODO: port this!
 #if LOG
 		std::cout << "done" << std::endl;
 #endif
-		times.push_back(elapsed_time_ms);
 
 		if(has_gt) {
 			disparity_errors(disparity_im, gt_file, &n, &n_err);
@@ -222,14 +219,7 @@ int main(int argc, char *argv[]) {
 #endif
 	}
 	closedir(dp);
-	finish_disparity_method();
-
-	double mean = std::accumulate(times.begin(), times.end(), 0.0) / times.size();
-	if(has_gt) {
-		printf("%f\n", (float) n_err/n);
-	} else {
-		std::cout << "It took an average of " << mean << " miliseconds, " << 1000.0f/mean << " fps" << std::endl;
-	}
+	finish_disparity_method(); // TODO: port this
 
 	return 0;
 }
