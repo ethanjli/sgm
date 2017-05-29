@@ -32,7 +32,7 @@
 #include "debug.h"
 
 void init_disparity_method(const uint8_t _p1, const uint8_t _p2);
-cv::Mat compute_disparity_method(cv::Mat left, cv::Mat right, const char* directory, const char* fname);
+cv::Mat compute_disparity_method(cv::Mat left, cv::Mat right);
 void finish_disparity_method();
 static void free_memory();
 

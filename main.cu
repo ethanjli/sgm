@@ -47,45 +47,6 @@ bool directory_exists(const char* dir) {
 	return ok;
 }
 
-void disparity_errors(cv::Mat estimation, const char* gt_file, int *n, int *n_err) {
-	int nlocal = 0;
-	int nerrlocal = 0;
-
-	cv::Mat gt_image = cv::imread(gt_file, cv::IMREAD_UNCHANGED);
-	if(!gt_image.data) {
-		std::cerr << "Couldn't read the file " << gt_file << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	if(estimation.rows != gt_image.rows || estimation.cols != gt_image.cols) {
-		std::cerr << "Ground truth must have the same dimesions" << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	const int type = estimation.type();
-	const uchar depth = type & CV_MAT_DEPTH_MASK;
-	for(int i = 0; i < gt_image.rows; i++) {
-		for(int j = 0; j < gt_image.cols; j++) {
-			const uint16_t gt = gt_image.at<uint16_t>(i, j);
-			if(gt > 0) {
-				const float gt_f = ((float)gt)/256.0f;
-				float est;
-				if(depth == CV_8U) {
-					est = (float) estimation.at<uint8_t>(i, j);
-				} else {
-					est = estimation.at<float>(i, j);
-				}
-				const float err = fabsf(est-gt_f);
-				const float ratio = err/fabsf(gt_f);
-				if(err > ABS_THRESH && ratio > REL_THRESH) {
-					nerrlocal++;
-				}
-				nlocal++;
-			}
-		}
-	}
-	*n += nlocal;
-	*n_err += nerrlocal;
-}
-
 bool check_directories_exist(const char* directory, const char* left_dir, const char* right_dir, const char* disparity_dir) {
 	char left_dir_sub[PATH_MAX];
 	char right_dir_sub[PATH_MAX];
@@ -193,14 +154,11 @@ int main(int argc, char *argv[]) {
 		std::cout << "processing: " << left_file << std::endl;
 #endif
 		// Compute
-		cv::Mat disparity_im = compute_disparity_method(h_im0, h_im1, directory, ep->d_name); // TODO: port this!
+		cv::Mat disparity_im = compute_disparity_method(h_im0, h_im1); // TODO: port this!
 #if LOG
 		std::cout << "done" << std::endl;
 #endif
 
-		if(has_gt) {
-			disparity_errors(disparity_im, gt_file, &n, &n_err);
-		}
 #if WRITE_FILES
 	const int type = disparity_im.type();
 	const uchar depth = type & CV_MAT_DEPTH_MASK;
