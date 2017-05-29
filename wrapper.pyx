@@ -39,14 +39,20 @@ cdef void mat2array(Mat mat, np.ndarray arr):
     cdef unsigned int pixel_size = 1
     memcpy(arr.data, mat.data, rows * cols * pixel_size)
 
-def compute_disparity(np.ndarray[np.uint8_t, ndim=2] left,
-                      np.ndarray[np.uint8_t, ndim=2] right):
+def images_to_disparity(np.ndarray[np.uint8_t, ndim=2] left,
+                        np.ndarray[np.uint8_t, ndim=2] right,
+                        np.ndarray[np.uint8_t, ndim=2] disparity):
     cdef Mat left_mat
     cdef Mat right_mat
-    cdef np.ndarray[np.uint8_t, ndim=2] disparity = np.empty((left.shape[0], left.shape[1]), dtype=np.uint8)
 
     array2mat(left, left_mat)
     array2mat(right, right_mat)
     cdef Mat disparity_mat = compute_disparity_method(left_mat, right_mat)
     mat2array(disparity_mat, disparity)
+
+def compute_disparity(np.ndarray[np.uint8_t, ndim=2] left,
+                      np.ndarray[np.uint8_t, ndim=2] right):
+    cdef np.ndarray[np.uint8_t, ndim=2] disparity = np.empty((left.shape[0], left.shape[1]), dtype=np.uint8)
+    images_to_disparity(left, right, disparity)
+
     return disparity
