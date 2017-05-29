@@ -19,6 +19,13 @@
 **/
 
 #include "disparity_method.h"
+#include "util.h"
+#include "configuration.h"
+#include "costs.h"
+#include "hamming_cost.h"
+#include "median_filter.h"
+#include "cost_aggregation.h"
+#include "debug.h"
 
 static cudaStream_t stream1, stream2, stream3;//, stream4, stream5, stream6, stream7, stream8;
 static uint8_t *d_im0;

@@ -1,1 +1,9 @@
 build
+
+wrapper.cpp
+*.so
+
+*.pyc
+
+*.swp
+*.swo
