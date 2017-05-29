@@ -55,6 +55,7 @@ try:
 except AttributeError:
     numpy_include = numpy.get_numpy_include()
 
+opencv_pkgconfig = subprocess.check_output(['pkg-config', '--libs', 'opencv'])
 
 ext = Extension('sgmgpu',
                 sources=['src/median_filter.cu',
@@ -64,7 +65,7 @@ ext = Extension('sgmgpu',
                          'src/costs.cu',
                          'wrapper.pyx'],
                 library_dirs=[CUDA['lib']],
-                libraries=['cudart'],
+                libraries=['cudart', 'opencv_core'],
                 language='c++',
                 runtime_library_dirs=[CUDA['lib']],
                 # this syntax is specific to this build system
@@ -73,7 +74,7 @@ ext = Extension('sgmgpu',
                 extra_compile_args={'nvcc': ['-O3', '-lineinfo',
                                              '-gencode=arch=compute_52,code=sm_52',
                                              '-c',
-                                             '--compiler-options', "'-fPIC'"]},
+                                             '--compiler-options', "-fPIC"]},
                 include_dirs = [numpy_include, CUDA['include'], 'src'])
 
 
