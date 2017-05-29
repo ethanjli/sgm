@@ -5,7 +5,7 @@ import scipy.misc
 import skimage
 import skimage.color
 import skimage.transform
-import sgmgpu
+import sgm
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -30,19 +30,16 @@ def compute_disparity(images):
         gray_images = [skimage.img_as_ubyte(skimage.color.rgb2gray(image), True)
                        for image in images]
 
-    return sgmgpu.compute_disparity(gray_images[0], gray_images[1])
+    return sgm.compute_disparity(gray_images[0], gray_images[1])
 
 
 def test():
-    file_paths = ['/home/chariot/Desktop/chariot-data/oxford/2014-06-26-08-53-56/stereo_preprocessed/left/1403772871155437.png',
-                  '/home/chariot/Desktop/chariot-data/oxford/2014-06-26-08-53-56/stereo_preprocessed/right/1403772871155437.png']
-    #file_paths = ['/home/chariot/Desktop/stereo/sgm/example/left/2.png',
-    #              '/home/chariot/Desktop/stereo/sgm/example/right/2.png']
+    file_paths = ['example/left/2.png', 'example/right/2.png']
     images = [load_image(file_path) for file_path in file_paths]
 
-    sgmgpu.init_disparity_method(15, 170)
+    sgm.initialize_disparity(15, 170)
     disparity = compute_disparity(images)
-    sgmgpu.finish_disparity_method()
+    sgm.finish_disparity()
 
     plt.figure()
     plt.imshow(disparity)
