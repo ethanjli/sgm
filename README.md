@@ -25,15 +25,20 @@ Simply use CMake and target the output directory as "build". In command line thi
 ```
 mkdir build
 cd build
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make
+```
+
+Note that this requires GCC version 5 or lower. On Ubuntu 17.04, you should replace `cmake ..` with the following:
+```
+cmake -DCUDA_HOST_COMPILER=/usr/bin/gcc-5 -DCMAKE_BUILD_TYPE=Release ..
 ```
 
 ## How to use it
 
 Type: `./sgm dir p1 p2`
 
-The arguments `p1` and `p2` are semi-global matching parameters, for more information read the SGM paper.
+The arguments `p1` and `p2` are semi-global matching parameters, for more information read the SGM paper. The KITTI benchmark uses p1 = 15 and p2 = 170.
 
 `dir` is the name of the directory which needs this format:
 
@@ -64,7 +69,7 @@ ICCS2016 – International Conference on Computational Science 2016
 
 ## Troubleshooting
 
-- Very fast execution and black disparity result: 
+- Very fast execution and black disparity result:
 This is usually an error related to the compute architecture used. Look at the CMakeLists.txt and change the architecture to the one you are using, please. If you run the application with nvprof you will see that it does not run any CUDA kernel.
 
 ## What to cite
